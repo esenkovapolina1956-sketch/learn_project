@@ -1,10 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!--
+файл: frontend/index.html
+Описание: Главная HTML страница фронтенда
+HTML - HyperText Markup Language(язык гипертекстовый разметки)
+-->
 
-</body>
+<!DOCTYPE html>
+<html lang = "ru">
 </html>
+    <!--
+    <head> - служебная часть документа, не отображается на странице
+    Содержит метаинформацию, стили, скрипты, заголовки
+    -->
+
+    <meta charset="UTF-8">
+    <!--
+    Метатег кодировки символов
+    UTF -8 - универсльная кодировка, аоддерживает русские буквы
+    Без этой строки Русский текст может отображаться как "краказябры"
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <--!
+    Метатег viewport для адаптивного дизйна
+    width=device-width - ширина страницы рана шире устройства
+    initial-scale=1.0 - начальный мсштаб 100%
+    Важно для мобильных утройств
+    -->
+
+    <title>Учет товаров на складе| Система управления </title>
+    <!--Подключаем Bootstrap5 CSS через CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootsttrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <--
+    Bootstrap - CSS фреймворк для создания адптивных интерфейсов
+    CDN (Content Delivery Network) - сеть доставки контента
+    Преимущевства CDN: кеширование, высокая скорость ,доступность
+    -->
+
+    <!-- Подключаем наш собственны CSS файл -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!--навигационное меню Bootstrap -->
+    <nav class = "navbar navbar-expand-lg navbar-dark dg-primary">
+        <!--
+        классы Bootstrap:
+        - navbar: базовый класс навигации
+        - navbar-expand-lg: расширяется на боль ших экранх
+        - navbar-dark: свентлый текст
+        -bg-primary: синий фон
+        -->
+        <div class="container">
+            <!-- container: ограничение ширину и центрирует -->
+            <a class="navbar-brand" href="#">
+                <strong>Складной учет</strong>
+            </a>
+            <!-- navar-brand: логотип или название сайта -->
+        </div>
+    </nav>
+    <!-- осовной контент страницы -->
+    <div class="container mt-4">
+        <!--
+        container: Щгранчевает ширину контента
+        mt-4: margin-top 4 единицы
+        Bootstrap использует систему отступов 0-5
+        -->
+
+        <!-- Заголовок страницы -->
+        <h1 class="text-center mb-4"></h1>
+    </div>
+</body>
