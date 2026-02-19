@@ -1,8 +1,6 @@
 """
 Основное Flask пиложение для API учета товаров
 """
-from http.cookiejar import debug
-
 from flask import Flask, jsonify
 from flask_cors import CORS
 import os
