@@ -1,102 +1,88 @@
-/*
-файл: frontend/script.js
-Назначение: Основной JAVAScript файл для фронтенда приложения для учета товаров
-JavaScript - язык программирования , который выполняется в браузере пользователя
-Функционал: Проверка соединения с ARI, обновление статуса на странице
- */
-
-//Строгий режим (scrict mode) JavaScript
-// включает дополнительные проверки и предотвращает распространенные ошибки
-//Например, запрещает использование необьявленных переменных
 'use strict';
-
-//===========================================
-//константы и переменные
-//Блок обьявления даннных, которые будут использоваться в программе
-//==========================================
-
-// Константа (неизменяемое значение) - базовый URL адрес API сервера
-// const означает, что это значение нельзя изменить после установки
-// API (Application Programming Interface) - интерфейс для обмена данными между приложениями
 const API_BASE_URL = 'http://localhost:5000';
-
-// Константа - интервал времени между проверками API в миллисекундах
-// 1000 миллисекунд = 1 секунда, поэтому 5000 = 5 секунд
 const API_CHECK_INTERVAL = 5000;
-
-// Переменная для хранения идентификатора таймера
-// let означает, что эту переменную можно изменять
-// null означает "пустое значение" или "ничего"
 let apiCheckTimer = null;
-
-//// ===========================================
-// // ОСНОВНАЯ ФУНКЦИЯ ПРОВЕРКИ API
-// // Функция - это блок кода, который выполняет определенную задачу
-// // ===========================================
-//
-// /**
-//  * Проверяет доступность API сервера
-//  * Обновляет статус на странице в зависимости от результата
-//  *
-//  * async function - асинхронная функция
-//  * Асинхронный код позволяет выполнять операции, которые занимают время
-//  * (например, запрос к серверу), не блокируя выполнение остального кода
-//  */
 async function checkApiStatus() {
-    // Получаем элементы DOM (Document Object Model) для отображения статуса
-    // DOM - это представление HTML документа в виде дерева объектов
-    // document - это объект, представляющий всю HTML страницу
-    // getElementById() - метод, который ищет элемент по его ID
-    // ID - уникальный идентификатор элемента в HTML
-
-    const statusElement = HTMLElement = document.getElementById( 'api-status' );
-    const spinnerElement = HTMLElement = document.getElementById(  'loading-spinner' );
-
-    // Блок try...catch - конструкция для обработки ошибок
-    // try - пытаемся выполнить код внутри этого блока
-    // catch - если в try произошла ошибка, выполняем код в catch
+    const statusElement = document.getElementById('api-status');
+    const spinnerElement = document.getElementById('loading-spinner');
     try {
-        // Отправляем GET запрос к корневому эндпоинту API
-        // fetch() - встроенная функция для выполнения HTTP запросов
-        // await - ждет, пока запрос завершится, прежде чем продолжать выполнение
-        // ${API_BASE_URL} - шаблонная строка, подставляет значение переменной
+        const response = await fetch(`${API_BASE_URL}/`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
-         const response = Response = await fetch( `${API_BASE_URL}/` ,  {
-             method: 'GET',              // HTTP метод GET (получение данных)
-             headers: {                // Заголовки запроса
-                 'Accept': 'application/json'   //Oжидаем получить данные в формате JSON
-             }
-         });
-
-        // Проверяем, успешен ли ответ
-        // response.ok - свойство, которое равно true, если HTTP статус 200-299
         if (response.ok) {
-            // Парсим (разбираем) JSON данные из ответа
-            // JSON (JavaScript Object Notation) - текстовый формат данных
-            // await response.json() - преобразует текст ответа в JavaScript объект
-
-         const data = await response.json();
-
-         // Обновляем текст элемента статуса на странице
-        // textContent - свойство для установки текстового содержимого элемента
-
-         statusElement.textContent = `API работает (версия ${data.version})`;
-
-         // Скрываем спиннер загрузки (анимацию вращения)
-         // style.display - CSS свойство для управления отображением элемента
-         // 'none' - скрыть элемент
-
-        spinnerElement.style.display = 'none';
-
-        // Выводим сообщение в консоль браузера
-        // console.log() - функция для вывода информации в консоль разработчика
-        // Консоль можно открыть в браузере нажатием F12
-
-         console.log('API сервер доступен');
+            const data = await response.json();
+            statusElement.textContent = `API работает (версия ${data.version})`;
+            spinnerElement.style.display = 'none';
+            console.log('API сервер доступен');
         } else {
-            // Если ответ не успешен, создаем ошибку
-            // throw - оператор для создания (выбрасывания) ошибки
-            // new Error() - создает новый объект ошибки с сообщением
-
-            throw new Error('Ошибка сервера: ${response.status}');
+            throw new Error(`Ошибка сервера: ${response.status}`);
         }
+
+    } catch (error) {
+    if (error.message.includes('Failed to fetch')) {
+       statusElement.textContent = 'API сервер недоступен';
+       console.log('API сервер недоступен. Запустите backend/app.py');
+    }
+    else if (error.message.includes('Ошибка сервера')) {
+         statusElement.textContent = 'Проблема с API сервером';
+         console.log('API сервер ответил с ошибкой');
+    }
+    else {
+        statusElement.textContent = 'Ошибка соединения';
+        console.log('Неизвестная ошибка:', error.message);
+    }
+
+    spinnerElement.style.display = 'inline-block';
+    }
+}
+
+function startApiMonitoring() {
+    checkApiStatus();
+    apiCheckTimer = setInterval(checkApiStatus, API_CHECK_INTERVAL);
+    console.log('Мониторинг API запущен');
+}
+
+function stopApiMonitoring() {
+    if (apiCheckTimer) {
+    clearInterval(apiCheckTimer);
+    apiCheckTimer = null;
+    console.log('Мониторинг API остановлен');
+    }
+}
+
+function initApp() {
+     console.log('Приложение инициализируется...');
+     startApiMonitoring();
+     setupEventlisteners();
+     console.log('Приложение готово к работе');
+}
+
+function setupEventlisteners() {
+     window.addEventListener('beforeunload', startApiMonitoring);
+     window.addEventListener('beforeunload', stopApiMonitoring);
+     window.addEventListener('offline', function () {
+          const statusElement = document.getElementById('api-status');
+          if (statusElement) {
+              statusElement.textContent = 'Нет интернет-соединения';
+          }
+     });
+}
+document.addEventListener('DOMContentLoaded', initApp);
+function  formatDate(date) {
+    return date.toLocaleString('ru-RU');
+}
+window.appDebug = {
+    checkApiStatus: checkApiStatus,
+    stopApiMonitoring: stopApiMonitoring,
+    formatDate: formatDate,
+}
+
+console.log('Для откладки используйте window.appDebug в консоли браузера (F12)');
+console.log('Доступные команды:');
+console.log(' window.appDebug.checkApiStatus() - проверить API');
+console.log(' window.appDebug.stopApiMonitoring() - остановить проверку');
+console.log(' window.appDebug.formatDate()) - форматировать дату');
